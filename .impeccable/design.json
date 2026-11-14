@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T16:46:04Z",
+  "title": "Design System: Placefile",
+  "extensions": {
+    "colorMeta": {
+      "catalogue-green": { "role": "neutral", "displayName": "Catalogue Green", "canonical": "#34503f", "tonalRamp": ["#0f1a14", "#1a2a20", "#23382a", "#34503f", "#4d6f5a", "#7a9886", "#a9c0b0", "#d6e3da"] },
+      "catalogue-green-deep": { "role": "neutral", "displayName": "Deep Catalogue Green", "canonical": "#2a4132", "tonalRamp": ["#0d1610", "#16251b", "#1f3326", "#2a4132", "#44634f", "#6f8d7a", "#a0b9a9", "#d3e1d8"] },
+      "brass": { "role": "primary", "displayName": "Brass", "canonical": "#c8a24c", "tonalRamp": ["#2e2307", "#52400f", "#745a17", "#8a6a1f", "#c8a24c", "#dbb961", "#e6c978", "#f5e8c0"] },
+      "brass-bright": { "role": "primary", "displayName": "Bright Brass", "canonical": "#dbb961", "tonalRamp": ["#3a2c08", "#614a10", "#8a6a1f", "#b08a35", "#c8a24c", "#dbb961", "#e6c978", "#f5e8c0"] },
+      "brass-dark": { "role": "primary", "displayName": "Dark Brass", "canonical": "#8a6a1f", "tonalRamp": ["#241b05", "#3e2f0b", "#574210", "#6f5518", "#8a6a1f", "#a98530", "#c8a24c", "#e6c978"] },
+      "index-card": { "role": "neutral", "displayName": "Index Card", "canonical": "#fdfdfb", "tonalRamp": ["#3a3a37", "#686865", "#92928f", "#b9b9b6", "#d6d6d3", "#eceee9", "#f6f6f3", "#fdfdfb"] },
+      "pale-blue-rule": { "role": "neutral", "displayName": "Pale Blue Rule", "canonical": "#bcd0e6", "tonalRamp": ["#1d2a3a", "#34496a", "#4f6a92", "#7490b8", "#bcd0e6", "#cfdded", "#e0eaf4", "#f1f5fa"] },
+      "red-line": { "role": "secondary", "displayName": "Red Rule", "canonical": "#c9453d", "tonalRamp": ["#3a0f0c", "#5f1a16", "#862520", "#a9342d", "#c9453d", "#d9726b", "#e79b96", "#f5cfcc"] },
+      "stamp-red": { "role": "secondary", "displayName": "Stamp Red", "canonical": "#b3261e", "tonalRamp": ["#330a08", "#58120e", "#7e1b15", "#b3261e", "#cf4f48", "#e07f79", "#ecaeaa", "#f7dcda"] },
+      "typewriter-ink": { "role": "neutral", "displayName": "Typewriter Ink", "canonical": "#1e2128", "tonalRamp": ["#0a0b0e", "#14161b", "#1e2128", "#2f333c", "#4a505c", "#7a808c", "#aeb3bc", "#dcdfe4"] },
+      "typewriter-ink-soft": { "role": "neutral", "displayName": "Soft Ink", "canonical": "#4a505c", "tonalRamp": ["#14161b", "#252930", "#363b45", "#4a505c", "#656c79", "#8a909c", "#b3b8c1", "#dcdfe4"] },
+      "on-ground-soft": { "role": "neutral", "displayName": "On Ground Soft", "canonical": "#cddcd2", "tonalRamp": ["#344a3c", "#4d6a58", "#6b8a76", "#8aa898", "#a9c0b0", "#cddcd2", "#e2ece6", "#f3f7f4"] },
+      "focus-yellow": { "role": "tertiary", "displayName": "Focus Yellow", "canonical": "#ffd978", "tonalRamp": ["#3d2f06", "#6b5210", "#997a1d", "#c9a23a", "#ffd978", "#ffe19a", "#ffecbd", "#fff7e0"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The single h1, Courier Prime 700 with tight tracking." },
+      "title": { "displayName": "Title", "purpose": "Place titles, tab labels, step heads on the 24px line." },
+      "body": { "displayName": "Body", "purpose": "Interface text in Archivo: ledes, notices, inputs." },
+      "typed": { "displayName": "Typed", "purpose": "Card body text in Courier Prime sitting on the ruled lines." },
+      "label": { "displayName": "Label", "purpose": "Small tracked Archivo Narrow labels for card heads, fields, list names." },
+      "button": { "displayName": "Button", "purpose": "Archivo 600 for every button." }
+    },
+    "shadows": [
+      { "name": "paper-stack", "value": "0 2px 0 -1px #eceee9, 0 3px 0 -1px rgba(0,0,0,.3), 0 10px 16px -8px rgba(0,0,0,.55)", "purpose": "Every index card: a thin sheet edge below, plus soft contact shadow." },
+      { "name": "brass-bevel", "value": "inset 0 1px 0 rgba(255,255,255,.55), 0 2px 3px rgba(0,0,0,.35)", "purpose": "Primary buttons, tab frames and the label holder." },
+      { "name": "recessed-label", "value": "inset 0 1px 2px rgba(0,0,0,.25)", "purpose": "Drawer label and the white strip inside each tab." },
+      { "name": "drawer-front", "value": "inset 0 2px 0 rgba(255,255,255,.1), inset 0 -14px 20px -14px rgba(0,0,0,.6), 0 24px 30px -18px rgba(0,0,0,.65)", "purpose": "The intake drawer face." }
+    ],
+    "motion": [
+      { "name": "ease-file", "value": "cubic-bezier(.16, 1, .3, 1)", "purpose": "Cards and tabs filing in (14px rise, 0.38s, 35ms stagger); tab slide-out; drawer pull." },
+      { "name": "ease-state", "value": ".15s ease-out", "purpose": "Hover and colour transitions, card rise of 2px." },
+      { "name": "reduced-motion", "value": "transition: none; animation: none", "purpose": "All motion removed under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "narrow", "value": "62rem" },
+      { "name": "mobile", "value": "40rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Bevelled brass button for the main action: choose files, download CSV, GeoJSON or KML.",
+      "html": "<button class=\"ds-btn-primary\">CSV</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: .5rem 1rem; font: 600 .9375rem/1.2 'Archivo', system-ui, sans-serif; color: #1b261f; background: linear-gradient(to bottom, #e6c978, #c8a24c 55%, #b08a35); border: 1px solid #6f5518; border-radius: 3px; box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 2px 3px rgba(0,0,0,.35); cursor: pointer; transition: background-color .15s ease-out; } .ds-btn-primary:hover { filter: brightness(1.08); } .ds-btn-primary:active { filter: brightness(.95); box-shadow: inset 0 1px 2px rgba(0,0,0,.3); } .ds-btn-primary:focus-visible { outline: 3px solid #ffd978; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action on the green ground (Add files, Start over, Show more).",
+      "html": "<button class=\"ds-btn-ghost\">Start over</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: .5rem 1rem; font: 600 .9375rem/1.2 'Archivo', system-ui, sans-serif; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.5); border-radius: 3px; cursor: pointer; transition: background-color .15s ease-out; } .ds-btn-ghost:hover { background: rgba(255,255,255,.1); } .ds-btn-ghost:focus-visible { outline: 3px solid #ffd978; outline-offset: 2px; }"
+    },
+    {
+      "name": "Dark Button",
+      "kind": "button",
+      "refersTo": "button-dark",
+      "description": "Action inside an index card, such as Look them up.",
+      "html": "<button class=\"ds-btn-dark\">Look them up</button>",
+      "css": ".ds-btn-dark { display: inline-flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: .5rem 1rem; font: 600 .9375rem/1.2 'Archivo', system-ui, sans-serif; color: #fff; background: #34503f; border: 1px solid #2a4132; border-radius: 3px; cursor: pointer; transition: background-color .15s ease-out; } .ds-btn-dark:hover { background: #3d5e4a; } .ds-btn-dark:focus-visible { outline: 3px solid #1e2128; outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Index-card input with a grey border and the standard focus ring.",
+      "html": "<input class=\"ds-input\" type=\"search\" placeholder=\"Search titles, notes and comments\">",
+      "css": ".ds-input { width: 100%; max-width: 28rem; min-height: 2.5rem; padding: .5rem .8rem; font: 400 .9375rem/1.3 'Archivo', system-ui, sans-serif; color: #1e2128; background: #fdfdfb; border: 1px solid #8b93a0; border-radius: 3px; } .ds-input::placeholder { color: #5b6270; } .ds-input:focus-visible { outline: 3px solid #ffd978; outline-offset: 2px; }"
+    },
+    {
+      "name": "Drawer Tab",
+      "kind": "nav",
+      "refersTo": "drawer-tab",
+      "description": "List rail item: brass frame around a white label with list name and count. Active state inverts to ink.",
+      "html": "<button class=\"ds-tab\"><span class=\"ds-tab-label\"><span>Favourites</span><span class=\"ds-tab-count\">24</span></span></button>",
+      "css": ".ds-tab { width: 17rem; display: block; padding: 3px; font: inherit; text-align: left; cursor: pointer; background: linear-gradient(to bottom, #e6c978, #c8a24c 50%, #a98530); border: 1px solid #6f5518; border-radius: 3px; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 2px 3px rgba(0,0,0,.35); } .ds-tab:hover { filter: brightness(1.08); } .ds-tab-label { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 2.2rem; padding: .3rem .7rem; background: #fdfdfb; color: #1e2128; border-radius: 1px; box-shadow: inset 0 1px 2px rgba(0,0,0,.3); font: 700 .9375rem/1.25 'Courier Prime', 'Courier New', monospace; } .ds-tab-count { font: 700 .8125rem/1 'Courier Prime', 'Courier New', monospace; font-variant-numeric: tabular-nums; color: #4a505c; } .ds-tab:focus-visible { outline: 3px solid #ffd978; outline-offset: 2px; }"
+    },
+    {
+      "name": "Place Card",
+      "kind": "card",
+      "refersTo": "index-card",
+      "description": "A saved place: red-lined typed title, ruled body, list name and coordinate stamp in the foot.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card-title\">Café Central</h3><div class=\"ds-card-body\"><p>Best pastel de nata.</p><p class=\"ds-address\">Rua Augusta 12, Lisbon</p></div><div class=\"ds-card-foot\"><span class=\"ds-list\">Favourites</span><span class=\"ds-stamp ds-stamp-approx\">Approximate</span></div></article>",
+      "css": ".ds-card { width: 18.5rem; display: flex; flex-direction: column; background: #fdfdfb; color: #1e2128; border-radius: 3px; box-shadow: 0 2px 0 -1px #eceee9, 0 3px 0 -1px rgba(0,0,0,.3), 0 10px 16px -8px rgba(0,0,0,.55); } .ds-card-title { margin: 0; padding: .3rem 1rem 0; min-height: calc(24px + .3rem); font: 700 .9375rem/24px 'Courier Prime', 'Courier New', monospace; border-bottom: 1px solid #c9453d; } .ds-card-body { padding: 0 1rem .5rem; font: 400 .9375rem/24px 'Courier Prime', 'Courier New', monospace; background-image: repeating-linear-gradient(to bottom, transparent 0 23px, #bcd0e6 23px 24px); } .ds-card-body p { margin: 0; } .ds-address { color: #4a505c; font-size: .875rem; } .ds-card-foot { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .35rem .75rem; align-items: center; padding: .55rem 1rem .65rem; border-top: 1px solid #bcd0e6; font: 400 .8125rem/1.3 'Courier Prime', monospace; color: #4a505c; } .ds-list { font: 600 .75rem/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif; letter-spacing: .1em; text-transform: uppercase; } .ds-stamp { display: inline-block; padding: 1px 7px; border: 2px solid currentColor; border-radius: 2px; font: 700 .75rem/1.3 'Courier Prime', monospace; letter-spacing: .08em; text-transform: uppercase; color: #34503f; transform: rotate(-2deg); } .ds-stamp-approx { color: #b3261e; box-shadow: inset 0 0 0 1px currentColor; }"
+    },
+    {
+      "name": "Intake Drawer",
+      "kind": "custom",
+      "refersTo": "drawer-tab",
+      "description": "The dropzone: a green drawer front with brass label holder, rivets and Choose-files button.",
+      "html": "<div class=\"ds-drawer\"><span class=\"ds-holder\"><span class=\"ds-rivet\"></span><span class=\"ds-drawer-label\">Drop Takeout .zip</span><span class=\"ds-rivet\"></span></span><span class=\"ds-drawer-text\">Drag the zip from Google here, or</span><span class=\"ds-drawer-btn\">Choose files</span></div>",
+      "css": ".ds-drawer { max-width: 36rem; display: flex; flex-direction: column; align-items: center; gap: .9rem; padding: 1.75rem 1.5rem 3rem; text-align: center; background: linear-gradient(to bottom, #2f4a3a, #263b2e); border: 3px solid #1c2c22; border-radius: 6px; outline: 2px solid #8a6a1f; outline-offset: -9px; box-shadow: inset 0 2px 0 rgba(255,255,255,.1), inset 0 -14px 20px -14px rgba(0,0,0,.6), 0 24px 30px -18px rgba(0,0,0,.65); color: #fff; font-family: 'Archivo', system-ui, sans-serif; } .ds-holder { display: inline-flex; align-items: center; gap: .55rem; padding: .35rem .6rem; background: linear-gradient(to bottom, #e6c978, #c8a24c 50%, #a98530); border: 1px solid #6f5518; border-radius: 3px; box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 2px 3px rgba(0,0,0,.45); } .ds-rivet { width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1be, #8a6a1f 70%); box-shadow: 0 0 0 1px rgba(60,44,8,.6); } .ds-drawer-label { padding: .3rem 1rem; background: #fdfdfb; color: #1e2128; border: 1px solid #6f5518; box-shadow: inset 0 1px 2px rgba(0,0,0,.25); font: 700 .875rem/1.2 'Courier Prime', monospace; letter-spacing: .12em; text-transform: uppercase; } .ds-drawer-btn { padding: .5rem 1rem; font: 600 .9375rem/1.2 'Archivo', sans-serif; color: #1b261f; background: linear-gradient(to bottom, #e6c978, #c8a24c 55%, #b08a35); border: 1px solid #6f5518; border-radius: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Catalogue Room",
+    "overview": "Saved places are index cards in a library card catalogue, not rows in an export. The page is a catalogue-room green ground with a faint paper grain. Lists are drawers and drawer-front tabs in brass, each place is a white index card with pale-blue ruled lines and a single red line under its title, and everything on a card is set in typewriter type. The tool files the user's data; it does not present an upload widget above a table.\n\nDensity is moderate and calm. One brass primary action per area carries all the colour; the rest is green, white card and ink. Depth is physical (paper edges, brass bevels, a drawer lip), never glassy. Motion is small and mechanical: a card files in, a tab slides out, a drawer pull gives a few pixels.",
+    "keyCharacteristics": [
+      "Green ground, white card: the only two large surfaces, with brass as the sole accent.",
+      "Typewriter (Courier Prime) for anything that sits on a card or names the thing being filed; Archivo for interface text and controls.",
+      "A 24px baseline (--line) shared by the ruled card background and the typed text so type sits on the rules.",
+      "Hardware (brass bevels, rivets, drawer pull) for controls; paper for content.",
+      "Honesty is rendered as ink: approximate coordinates are the one red thing on a card."
+    ],
+    "rules": [
+      { "name": "The Two-Ground Rule", "body": "Large areas are catalogue green or index card, nothing else. A third large surface colour breaks the room.", "section": "colors" },
+      { "name": "The Red Is Ink Rule", "body": "Red appears only as the single red line on a card head and as stamp or error ink. It is never a button, a badge fill, or decoration.", "section": "colors" },
+      { "name": "The Brass Is Hardware Rule", "body": "Brass belongs to things you pull, press or label: primary buttons, tab frames, the drawer holder. It is not used for panels or backgrounds.", "section": "colors" },
+      { "name": "The Typed Is Filed Rule", "body": "Courier Prime is for the user's data and the filing apparatus (titles, notes, stamps, tabs, counts). Archivo is for the instrument (buttons, inputs, explanatory prose). Don't swap them.", "section": "typography" },
+      { "name": "The Baseline Rule", "body": "Any ruled card body uses --line (24px) as its line-height so text sits on the pale-blue rule. Change the variable, not individual line-heights.", "section": "typography" },
+      { "name": "The Paper-Not-Plastic Rule", "body": "Shadows describe sheets and metal. No diffuse tinted glows, no card-on-card stacking beyond the peek tabs.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep large surfaces to catalogue green (#34503f) and index card (#fdfdfb), and put all content on cards.",
+      "Do set card text in Courier Prime on the 24px rule line, with one red line under the head.",
+      "Do build primary controls as bevelled brass (gradient, #6f5518 edge, brass bevel shadow) with dark text.",
+      "Do mark every place's coordinate provenance with a stamp, using stamp-red for approximate.",
+      "Do switch focus rings to ink on cards and keep Focus Yellow on green.",
+      "Do keep entrance motion to the file-in rise and honour reduced motion."
+    ],
+    "donts": [
+      "Don't use red for anything but the card rule, stamps and error messages.",
+      "Don't introduce a third surface colour, a gradient background wash, or glassmorphism.",
+      "Don't set card body text in Archivo or button text in Courier; the two voices stay separate.",
+      "Don't show a place as a table row; places are cards.",
+      "Don't add icons as glyph characters; marks in this system are inline SVG (lock, wordmark, drawer pull).",
+      "Don't invent sample metrics or testimonials; sample data is always labelled as such (banner in dashed Focus Yellow)."
+    ]
+  }
+}
