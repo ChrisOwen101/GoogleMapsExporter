@@ -62,6 +62,7 @@ a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; 
   border: 1px solid transparent; border-radius: 3px; cursor: pointer;
   text-decoration: none; transition: background-color .15s ease-out, border-color .15s ease-out;
 }
+.fmt { font: 700 .6875rem/1 var(--mono, monospace); letter-spacing: .06em; padding: .15rem .35rem; border: 1px solid rgba(27, 38, 31, .45); border-radius: 2px; }
 .btn-primary { background: linear-gradient(to bottom, #e6c978, #c8a24c 55%, #b08a35); color: #1b261f; border-color: #6f5518; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 2px 3px rgba(0, 0, 0, .35); }
 .btn-primary:hover { filter: brightness(1.08); }
 .btn-primary:active { filter: brightness(.95); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .3); }
@@ -212,11 +213,8 @@ h1 { margin: 0; font: 700 2.75rem/1.1 var(--typed); letter-spacing: -0.04em; tex
   background: var(--card); border: 1px solid #8b93a0; border-radius: 3px;
 }
 .search input::placeholder, .field input::placeholder { color: #5b6270; }
-.type-filter select {
-  min-height: 2.5rem; padding: .5rem .8rem;
-  font: 400 .9375rem/1.3 var(--ui); color: var(--ink);
-  background: var(--card); border: 1px solid #8b93a0; border-radius: 3px;
-}
+.rail-head { margin: 0 0 .5rem; font: 600 .75rem/1.2 var(--label); letter-spacing: .12em; text-transform: uppercase; color: var(--on-ground-2); }
+.rail ul + .rail-head { margin-top: 1.5rem; }
 .export { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .export-scope { margin-right: .35rem; font-size: .875rem; color: var(--on-ground-2); }
 
@@ -333,6 +331,18 @@ body.dragging .veil { display: flex; }
   box-shadow: 0 14px 22px -14px rgba(0, 0, 0, .6);
 }
 #map.is-empty { display: none; }
+.pin-wrap { background: none; border: 0; }
+.pin {
+  display: grid; place-items: center; width: 30px; height: 30px; box-sizing: border-box;
+  background: #c8a24c; color: #1e2128; border: 2px solid #1e2128; border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .45);
+}
+.pin-approx { background: #d4453d; color: #fff; }
+.pin svg, .tab-icon svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pin svg { width: 17px; height: 17px; }
+.tab-main { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.tab-icon { display: grid; flex: none; }
+.tab-icon svg { width: 1.05rem; height: 1.05rem; }
 .map-note { margin: .6rem 0 0; font-size: .875rem; color: var(--on-ground-2); }
 .leaflet-container { font-family: var(--ui); }
 .leaflet-popup-content-wrapper { border-radius: 3px; background: var(--card); color: var(--ink); }

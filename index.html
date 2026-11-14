@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Placefile: get your saved places out of Google Maps</title>
-<meta name="description" content="Drop in your Google Takeout export and download every saved place as CSV, GeoJSON or KML. Files are read in your browser and never uploaded.">
+<meta name="description" content="Turn the places you saved in Google Maps into a spreadsheet or map file you can keep. Your files stay on your device and are never uploaded.">
 <meta name="theme-color" content="#34503f">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%2334503f'/%3E%3Crect x='6' y='8' width='20' height='16' rx='2' fill='%23fdfdfb' stroke='%23c8a24c' stroke-width='2'/%3E%3Crect x='11' y='13' width='10' height='3' fill='%2334503f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +44,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </a>
   <p class="privacy">
     <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2M3 7h10v7H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-    Files are read in this tab. Nothing is uploaded.
+    Your files stay on your device. Nothing is uploaded.
   </p>
 </header>
 
@@ -52,15 +52,15 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <section id="intake" class="intake" aria-labelledby="intake-title">
     <div class="intake-lead">
       <h1 id="intake-title">Get your saved places out of Google Maps.</h1>
-      <p class="lede">Google hands you the raw Takeout files. Placefile files them: every list and starred place in one catalogue, ready to download as CSV, GeoJSON or KML.</p>
+      <p class="lede">Google lets you download your saved places, but the files are hard to use. Placefile puts every list and starred place in one easy page, then lets you download them as a spreadsheet or a map file.</p>
 
       <div class="drawer-wrap">
         <div class="peek" aria-hidden="true"><span>Favourites</span><span>Want to go</span><span>Starred places</span></div>
         <label class="drawer" id="drop" for="file">
-          <span class="holder"><span class="rivet"></span><span class="drawer-label">Drop Takeout .zip</span><span class="rivet"></span></span>
-          <span class="drawer-text">Drag the zip from Google here, or</span>
-          <span class="btn btn-primary drawer-btn">Choose files</span>
-          <span class="drawer-hint">You can also drop the loose .csv and .json files.</span>
+          <span class="holder"><span class="rivet"></span><span class="drawer-label">Drop your file here</span><span class="rivet"></span></span>
+          <span class="drawer-text">Drag the zip file you got from Google here, or</span>
+          <span class="btn btn-primary drawer-btn">Choose a file</span>
+          <span class="drawer-hint">Already unzipped it? You can drop the .csv and .json files instead.</span>
           <svg class="drawer-pull" width="150" height="34" viewBox="0 0 150 34" aria-hidden="true">
             <path d="M12 6h126v6H12z" fill="#6f5518"/>
             <rect x="6" y="2" width="138" height="20" rx="10" fill="url(#brass)" stroke="#7a5d1a" stroke-width="1.5"/>
@@ -72,32 +72,32 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </div>
 
       <p id="intake-error" class="errata" role="alert" hidden></p>
-      <p class="sample-line"><button type="button" class="link" id="sample">Try it with sample data</button> if you don't have a Takeout yet.</p>
+      <p class="sample-line"><button type="button" class="link" id="sample">Try it with example places</button> if you don't have your file yet.</p>
     </div>
 
-    <ol class="steps" aria-label="How to get your Takeout">
+    <ol class="steps" aria-label="How to get your file from Google">
       <li class="card step">
         <p class="card-head">Step 1</p>
         <div class="card-body">
-          <p><b>Open <a href="https://takeout.google.com" target="_blank" rel="noopener">takeout.google.com</a></b> and sign in. Click <b>Deselect all</b>.</p>
+          <p><b>Go to <a href="https://takeout.google.com" target="_blank" rel="noopener">takeout.google.com</a></b> and sign in to Google. Click <b>Deselect all</b>.</p>
         </div>
       </li>
       <li class="card step">
         <p class="card-head">Step 2</p>
         <div class="card-body">
-          <p>Tick <b>Saved</b> and <b>Maps (your places)</b>. Click <b>Next step</b>, then <b>Create export</b>.</p>
+          <p>Scroll down and tick <b>Saved</b> and <b>Maps (your places)</b>. Click <b>Next step</b>, then <b>Create export</b>.</p>
         </div>
       </li>
       <li class="card step">
         <p class="card-head">Step 3</p>
         <div class="card-body">
-          <p>Download the zip from Google's email. Drop it here as it is. No need to unzip.</p>
+          <p>Google emails you a download link, which can take a few minutes. Download the zip file and drop it here. Don't open it first.</p>
         </div>
       </li>
       <li class="card step step-note">
         <p class="card-head">Good to know</p>
         <div class="card-body">
-          <p>Lists come without coordinates. Starred and labelled places come with them. Placefile can look up the rest.</p>
+          <p>Places in your lists (like Want to go) arrive without a spot on the map. Starred and labelled places have one. Placefile can find the missing ones for you.</p>
         </div>
       </li>
     </ol>
@@ -107,67 +107,66 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <div class="ledger">
       <p id="ledger-line" class="ledger-line" aria-live="polite"></p>
       <div class="ledger-actions">
-        <label class="btn btn-ghost" for="file-more">Add files<input type="file" id="file-more" accept=".zip,.csv,.json,.geojson" multiple></label>
-        <button type="button" class="btn btn-ghost" id="reset">Start over</button>
+        <label class="btn btn-ghost" for="file-more">Add more files<input type="file" id="file-more" accept=".zip,.csv,.json,.geojson" multiple></label>
+        <button type="button" class="btn btn-ghost" id="reset" title="Remove these places, including the copy kept in this browser">Start over</button>
       </div>
     </div>
-    <p id="sample-banner" class="sample-banner" hidden>Showing synthetic sample data, not your places.</p>
+    <p id="sample-banner" class="sample-banner" hidden>These are example places, not yours.</p>
     <p id="workspace-error" class="errata" role="alert" hidden></p>
 
     <div class="layout">
-      <nav class="rail" aria-label="Lists">
+      <nav class="rail" aria-label="Browse by list or type">
+        <h2 class="rail-head">Your lists</h2>
         <ul id="rail"></ul>
+        <h2 class="rail-head">Types</h2>
+        <ul id="kinds"></ul>
       </nav>
 
       <div class="main-col">
         <div class="tools">
           <label class="search">
             <span class="sr">Search places</span>
-            <input type="search" id="q" placeholder="Search titles, notes and comments" autocomplete="off">
+            <input type="search" id="q" placeholder="Search by name, note or comment" autocomplete="off">
           </label>
-          <label class="type-filter">
-            <span class="sr">Filter by type</span>
-            <select id="kind"></select>
-          </label>
-          <div class="export" role="group" aria-label="Download">
+          <div class="export" role="group" aria-label="Download your places">
             <span id="export-scope" class="export-scope"></span>
-            <button type="button" class="btn btn-primary" data-fmt="csv">CSV</button>
-            <button type="button" class="btn btn-primary" data-fmt="geojson">GeoJSON</button>
-            <button type="button" class="btn btn-primary" data-fmt="kml">KML</button>
+            <button type="button" class="btn btn-primary" data-fmt="csv" title="Opens in Excel, Numbers and Google Sheets. Includes every place.">Spreadsheet <span class="fmt">CSV</span></button>
+            <button type="button" class="btn btn-primary" data-fmt="geojson" title="A map file for mapping tools. Places without a map location are left out.">Map file <span class="fmt">GeoJSON</span></button>
+            <button type="button" class="btn btn-primary" data-fmt="kml" title="A map file for Google Earth and Google My Maps. Places without a map location are left out.">Google Earth <span class="fmt">KML</span></button>
           </div>
         </div>
 
         <section class="mapframe" aria-label="Map of places">
-          <div id="map" role="region" aria-label="Interactive map of your places"></div>
+          <div id="map" role="region" aria-label="Map of your places"></div>
           <p id="map-note" class="map-note" aria-live="polite"></p>
         </section>
 
         <section id="geo" class="card slip" aria-labelledby="geo-title" hidden>
-          <p class="card-head" id="geo-title">Missing coordinates</p>
+          <p class="card-head" id="geo-title">Places not on the map yet</p>
           <div class="card-body slip-body">
             <p id="geo-copy"></p>
             <div class="slip-row">
               <label class="field">
-                <span>Near (optional)</span>
+                <span>Where are they? (optional)</span>
                 <input type="text" id="near" placeholder="e.g. Lisbon, Portugal" autocomplete="off">
               </label>
-              <button type="button" class="btn btn-dark" id="geo-run">Look them up</button>
+              <button type="button" class="btn btn-dark" id="geo-run">Find them on the map</button>
               <button type="button" class="btn btn-dark-ghost" id="geo-cancel" hidden>Stop</button>
             </div>
-            <progress id="geo-progress" max="1" value="0" hidden aria-label="Lookup progress"></progress>
+            <progress id="geo-progress" max="1" value="0" hidden aria-label="Search progress"></progress>
             <p id="geo-status" class="geo-status" role="status"></p>
           </div>
         </section>
 
         <section id="types" class="card slip" aria-labelledby="types-title" hidden>
-          <p class="card-head" id="types-title">Place types</p>
+          <p class="card-head" id="types-title">Types of place</p>
           <div class="card-body slip-body">
             <p id="types-copy"></p>
             <div class="slip-row">
-              <button type="button" class="btn btn-dark" id="types-run">Look up types</button>
+              <button type="button" class="btn btn-dark" id="types-run">Find types</button>
               <button type="button" class="btn btn-dark-ghost" id="types-cancel" hidden>Stop</button>
             </div>
-            <progress id="types-progress" max="1" value="0" hidden aria-label="Type lookup progress"></progress>
+            <progress id="types-progress" max="1" value="0" hidden aria-label="Type search progress"></progress>
             <p id="types-status" class="geo-status" role="status"></p>
           </div>
         </section>
@@ -181,10 +180,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 </main>
 
 <footer class="foot">
-  <p>Not affiliated with Google. Map tiles come from <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a> and place lookups from <a href="https://nominatim.org" target="_blank" rel="noopener">Nominatim</a>; tiles reveal the area you view, never your list. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>.</p>
+  <p>Not affiliated with Google. Map pictures come from <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a> and place searches from <a href="https://nominatim.org" target="_blank" rel="noopener">Nominatim</a>. They only see the area of the map you are looking at, never your list. Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>.</p>
 </footer>
 
-<div id="drop-veil" class="veil" aria-hidden="true"><p>Release to file these</p></div>
+<div id="drop-veil" class="veil" aria-hidden="true"><p>Drop to add your files</p></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="lib.js"></script>

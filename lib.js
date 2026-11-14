@@ -11,19 +11,19 @@
 
   async function openZip(blob) {
     const size = blob.size;
-    if (size < 22) throw new Error('This does not look like a zip file.');
+    if (size < 22) throw new Error('This doesn\'t look like a zip file. Use the .zip you downloaded from Google.');
     const tailLen = Math.min(size, 22 + 65535);
     const tail = new DataView(await blob.slice(size - tailLen, size).arrayBuffer());
     let eocd = -1;
     for (let i = tailLen - 22; i >= 0; i--) {
       if (tail.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
     }
-    if (eocd < 0) throw new Error('This does not look like a zip file.');
+    if (eocd < 0) throw new Error('This doesn\'t look like a zip file. Use the .zip you downloaded from Google.');
     const total = tail.getUint16(eocd + 10, true);
     const cdSize = tail.getUint32(eocd + 12, true);
     const cdOff = tail.getUint32(eocd + 16, true);
     if (total === 0xffff || cdSize === 0xffffffff || cdOff === 0xffffffff) {
-      throw new Error('This archive is too large to read here. Request a new Takeout with only Saved and Maps (your places) ticked.');
+      throw new Error('This zip is too big to open here. Make a new export on Google Takeout with only Saved and Maps (your places) ticked.');
     }
     const cdBuf = await blob.slice(cdOff, cdOff + cdSize).arrayBuffer();
     const cd = new DataView(cdBuf);
@@ -53,15 +53,15 @@
   }
 
   async function extractEntry(blob, e) {
-    if (e.flags & 1) throw new Error(`${e.name} is password protected.`);
+    if (e.flags & 1) throw new Error(`${e.name} is protected by a password, so it can\'t be opened here.`);
     const lh = new DataView(await blob.slice(e.offset, e.offset + 30).arrayBuffer());
-    if (lh.getUint32(0, true) !== 0x04034b50) throw new Error('The zip file is damaged.');
+    if (lh.getUint32(0, true) !== 0x04034b50) throw new Error('This zip file looks damaged. Try downloading it from Google again.');
     const start = e.offset + 30 + lh.getUint16(26, true) + lh.getUint16(28, true);
     const raw = blob.slice(start, start + e.compSize);
     if (e.method === 0) return new Uint8Array(await raw.arrayBuffer());
-    if (e.method !== 8) throw new Error(`${e.name} uses an unsupported compression method.`);
+    if (e.method !== 8) throw new Error(`${e.name} is packed in a way this page can\'t open. Unzip the download yourself, then drop the .csv and .json files here.`);
     if (typeof DecompressionStream === 'undefined') {
-      throw new Error('This browser cannot unzip files. Unzip the download yourself and drop the CSV and JSON files instead.');
+      throw new Error('This browser can\'t open zip files. Unzip the download yourself, then drop the .csv and .json files here.');
     }
     const stream = raw.stream().pipeThrough(new DecompressionStream('deflate-raw'));
     return new Uint8Array(await new Response(stream).arrayBuffer());
@@ -286,13 +286,13 @@
             const got = parseText(e.name, new TextDecoder('utf-8').decode(await e.bytes()));
             if (got) { places.push(...got); found++; }
           }
-          if (!found) issues.push(`${name}: no saved places inside. Make sure Saved and Maps (your places) were ticked in Takeout.`);
+          if (!found) issues.push(`${name}: no saved places found in this zip. When you made your export on Google Takeout, were Saved and Maps (your places) ticked?`);
         } else if (/\.(csv|json|geojson)$/i.test(name)) {
           const got = parseText(name, await file.text());
           if (got) places.push(...got);
-          else issues.push(`${name}: this is not a Google Maps saved places file.`);
+          else issues.push(`${name}: this doesn't look like a file of saved places from Google.`);
         } else {
-          issues.push(`${name}: expected a .zip, .csv or .json file.`);
+          issues.push(`${name}: this type of file can't be used. Use the .zip from Google, or the .csv and .json files inside it.`);
         }
       } catch (err) {
         issues.push(`${name}: ${err.message}`);

@@ -38,7 +38,7 @@
     clearErrors();
     const { places, issues } = await PF.ingestFiles(files);
     if (!places.length) {
-      showError(issues.length ? issues.join('\n') : 'No saved places were found in those files.');
+      showError(issues.length ? issues.join('\n') : 'We couldn\'t find any saved places in those files.');
       return;
     }
     if (fresh || state.sample) state.places = [];
@@ -50,7 +50,47 @@
     $('q').value = '';
     state.shown = PAGE;
     if (issues.length) showError(issues.join('\n'), 'workspace');
+    save();
     enterWorkspace();
+  }
+
+  /* ---------- saved copy (this browser only) ---------- */
+
+  const STORE_KEY = 'placefile:v1';
+
+  function save() {
+    if (state.sample) return;
+    try {
+      if (state.places.length) localStorage.setItem(STORE_KEY, JSON.stringify({ v: 1, places: state.places }));
+      else localStorage.removeItem(STORE_KEY);
+    } catch (err) {
+      // Storage full or blocked: the catalogue still works for this session.
+    }
+  }
+
+  function clearSaved() {
+    try { localStorage.removeItem(STORE_KEY); } catch (err) { /* blocked */ }
+  }
+
+  function loadSaved() {
+    try {
+      const data = JSON.parse(localStorage.getItem(STORE_KEY));
+      if (!data || data.v !== 1 || !Array.isArray(data.places)) return [];
+      return data.places
+        .filter((p) => p && typeof p.title === 'string' && typeof p.list === 'string')
+        .map((p) => {
+          const ok = PF.validCoords(p.lat, p.lng);
+          return {
+            note: '', comment: '', tags: '', url: '', address: '', matched: '', kind: '', kindSource: null,
+            ...p,
+            lat: ok ? p.lat : null,
+            lng: ok ? p.lng : null,
+            source: ok ? p.source || 'takeout' : null,
+          };
+        });
+    } catch (err) {
+      return [];
+    }
   }
 
   function showError(msg, where) {
@@ -76,6 +116,8 @@
     abortGeocode();
     abortTypes();
     state.typeNote = '';
+    if (!state.sample) clearSaved();
+    state.places = [];
     state.sample = false;
     $('workspace').hidden = true;
     $('intake').hidden = false;
@@ -131,10 +173,31 @@
     return true;
   }
 
+  /* ---------- type icons ---------- */
+
+  // 24x24 outline glyphs, drawn with currentColor.
+  const ICONS = {
+    'Café': '<path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 9h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2"/>',
+    Restaurant: '<path d="M6 3v7M4 3v5a2 2 0 0 0 4 0V3M6 10v11"/><path d="M17 21V3c-2.5 1.5-3 5-3 8h3"/>',
+    Bar: '<path d="M4 4h16l-8 9z"/><path d="M12 13v7M8 20h8"/>',
+    Museum: '<path d="M3 9l9-5 9 5z"/><path d="M5 11v7M9.5 11v7M14.5 11v7M19 11v7M3 20h18"/>',
+    Park: '<path d="M12 3l5 8h-3l4 6H6l4-6H7z"/><path d="M12 17v4"/>',
+    Hotel: '<path d="M3 19V6M3 15h18v4M21 15v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11.5" r="1.5"/>',
+    Market: '<path d="M4 9l1.5-5h13L20 9z"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9M5 12v8h14v-8"/>',
+    Shop: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    Beach: '<path d="M3 12a9 9 0 0 1 18 0z"/><path d="M12 12v6M3 21c3-2 6-2 9 0s6 2 9 0"/>',
+    Transport: '<rect x="5" y="4" width="14" height="13" rx="3"/><path d="M5 11h14M8 21l2-4M16 21l-2-4"/>',
+    Attraction: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+    Area: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+    '': '<circle cx="12" cy="12" r="3"/>',
+  };
+
+  const iconSvg = (kind) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[kind] || ICONS['']}</svg>`;
+
   function popup(p) {
-    const box = el('div', {}, el('span', { class: 'pop-list', text: p.list }), el('b', { text: p.title }));
+    const box = el('div', {}, el('span', { class: 'pop-list', text: p.kind ? `${p.list} · ${p.kind}` : p.list }), el('b', { text: p.title }));
     if (p.note) box.append(el('div', { text: p.note }));
-    if (p.source === 'geocoded') box.append(el('div', { text: 'Approximate: matched by title on OpenStreetMap.' }));
+    if (p.source === 'geocoded') box.append(el('div', { text: 'Approximate spot: found by searching for the name on OpenStreetMap.' }));
     if (/^https?:\/\//i.test(p.url)) box.append(el('a', { href: p.url, target: '_blank', rel: 'noopener', text: 'Open in Google Maps' }));
     return box;
   }
@@ -144,15 +207,15 @@
     const mapEl = $('map');
     if (!window.L) {
       mapEl.classList.add('is-empty');
-      note.textContent = 'The map library could not load. Check your connection and reload to see the map.';
+      note.textContent = "The map couldn't load. Check your internet connection and reload the page.";
       return;
     }
     const rows = visible();
     const located = rows.filter((p) => p.lat != null);
     mapEl.classList.toggle('is-empty', !located.length);
     note.textContent = located.length
-      ? `${located.length.toLocaleString()} of ${rows.length.toLocaleString()} shown on the map.${located.length < rows.length ? ' The rest have no coordinates yet.' : ''}`
-      : 'Nothing to plot yet: none of these places have coordinates. Look them up below.';
+      ? `${located.length.toLocaleString()} of ${rows.length.toLocaleString()} shown on the map.${located.length < rows.length ? ' The rest don\'t have a map location yet.' : ''}`
+      : 'None of these places are on the map yet. Use "Find them on the map" below.';
     if (!located.length || !ensureMap()) return;
 
     map.inst.invalidateSize();
@@ -160,11 +223,18 @@
     map.markers.clear();
     for (const p of located) {
       const approx = p.source === 'geocoded';
-      const m = L.circleMarker([p.lat, p.lng], {
-        radius: 7, weight: 2, color: '#1e2128', fillOpacity: 0.95,
-        fillColor: approx ? '#d4453d' : '#c8a24c',
+      const m = L.marker([p.lat, p.lng], {
+        icon: L.divIcon({
+          className: 'pin-wrap',
+          html: `<span class="pin${approx ? ' pin-approx' : ''}">${iconSvg(p.kind)}</span>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15],
+          popupAnchor: [0, -14],
+        }),
+        title: p.kind ? `${p.title} (${p.kind})` : p.title,
+        keyboard: true,
       }).bindPopup(() => popup(p));
-      m.bindTooltip(p.title, { direction: 'top', offset: [0, -6] });
+      m.bindTooltip(p.title, { direction: 'top', offset: [0, -14] });
       m.addTo(map.layer);
       map.markers.set(p, m);
     }
@@ -200,42 +270,48 @@
     const line = $('ledger-line');
     line.replaceChildren(
       el('b', { text: plural(total, 'place') }),
-      ` in ${plural(lists().length, 'list')}. ${located.toLocaleString()} ${located === 1 ? 'has' : 'have'} coordinates.`
+      ` in ${plural(lists().length, 'list')}. ${located.toLocaleString()} ${located === 1 ? 'is' : 'are'} on the map.`
     );
   }
 
+  function railItem(name, count, pressed, onClick, icon) {
+    const label = el('span', { class: 'tab-name', text: name, title: name });
+    let lead = label;
+    if (icon !== undefined) {
+      const glyph = el('span', { class: 'tab-icon' });
+      glyph.innerHTML = iconSvg(icon);
+      lead = el('span', { class: 'tab-main' }, glyph, label);
+    }
+    const b = el('button', { type: 'button', class: 'tab', 'aria-pressed': String(pressed) },
+      el('span', { class: 'tab-label' }, lead, el('span', { class: 'tab-count', text: count.toLocaleString() })));
+    b.addEventListener('click', onClick);
+    return el('li', {}, b);
+  }
+
   function renderRail() {
-    const rail = $('rail');
     const all = [[null, 'All places', state.places.length], ...lists().map(([n, c]) => [n, n, c])];
-    rail.replaceChildren(...all.map(([key, name, count]) => {
-      const b = el('button', { type: 'button', class: 'tab', 'aria-pressed': String(state.list === key) },
-        el('span', { class: 'tab-label' },
-          el('span', { class: 'tab-name', text: name, title: name }),
-          el('span', { class: 'tab-count', text: count.toLocaleString() })));
-      b.addEventListener('click', () => {
-        state.list = key;
-        state.shown = PAGE;
-        render();
-      });
-      return el('li', {}, b);
-    }));
+    $('rail').replaceChildren(...all.map(([key, name, count]) => railItem(name, count, state.list === key, () => {
+      state.list = key;
+      state.shown = PAGE;
+      render();
+    })));
   }
 
   function renderKinds() {
     const found = kinds();
     if (state.kind != null && !found.some(([k]) => k === state.kind)) state.kind = null;
     const total = found.reduce((n, [, c]) => n + c, 0);
-    const select = $('kind');
-    select.replaceChildren(
-      el('option', { value: '*', text: `All types (${total.toLocaleString()})` }),
-      ...found.map(([k, c]) => el('option', { value: k, text: `${k || 'Unknown'} (${c.toLocaleString()})` }))
-    );
-    select.value = state.kind == null ? '*' : state.kind;
+    const all = [[null, 'All types', total, undefined], ...found.map(([k, c]) => [k, k || 'Unknown type', c, k])];
+    $('kinds').replaceChildren(...all.map(([key, name, count, icon]) => railItem(name, count, state.kind === key, () => {
+      state.kind = key;
+      state.shown = PAGE;
+      render();
+    }, icon)));
   }
 
   function renderExport() {
     const n = inScope().length;
-    $('export-scope').textContent = state.list == null ? `Download all ${n.toLocaleString()}` : `Download ${n.toLocaleString()} from ${state.list}`;
+    $('export-scope').textContent = state.list == null ? `Download all ${n.toLocaleString()}` : `Download ${n.toLocaleString()} from “${state.list}”`;
   }
 
   function renderGeo() {
@@ -244,7 +320,7 @@
     const running = !!state.geo;
     panel.hidden = !missing.length && !running;
     if (panel.hidden) return;
-    $('geo-copy').textContent = `${plural(missing.length, 'place has', 'places have')} no coordinates yet. Look them up by title on OpenStreetMap. Titles are sent to nominatim.openstreetmap.org, about one a second, and matches are approximate.`;
+    $('geo-copy').textContent = `${plural(missing.length, 'place has', 'places have')} no spot on the map yet. Placefile can search for each one by name on OpenStreetMap, a free map service. The names (nothing else) are sent to it, about one per second, so this can take a while. Results are best guesses.`;
     $('geo-run').hidden = running;
     $('geo-cancel').hidden = !running;
     $('near').disabled = running;
@@ -256,10 +332,10 @@
     $('cards').replaceChildren(...slice.map(card));
     const empty = $('empty');
     empty.hidden = rows.length > 0;
-    if (!rows.length) empty.textContent = state.query ? `No cards match "${state.query}".` : 'This drawer is empty.';
+    if (!rows.length) empty.textContent = state.query ? `Nothing matches "${state.query}".` : 'There are no places here.';
     const more = $('more');
     more.hidden = rows.length <= slice.length;
-    if (!more.hidden) more.textContent = `Show ${Math.min(PAGE, rows.length - slice.length)} more (${(rows.length - slice.length).toLocaleString()} left)`;
+    if (!more.hidden) more.textContent = `Show ${Math.min(PAGE, rows.length - slice.length)} more (${(rows.length - slice.length).toLocaleString()} not shown yet)`;
   }
 
   function card(p) {
@@ -271,10 +347,10 @@
     let coords, stamp;
     if (p.lat != null) {
       coords = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
-      stamp = p.source === 'geocoded' ? ['stamp-geocoded', 'Approximate'] : p.source === 'link' ? ['', 'From link'] : ['', 'Exact'];
+      stamp = p.source === 'geocoded' ? ['stamp-geocoded', 'Best guess'] : p.source === 'link' ? ['', 'From Google link'] : ['', 'Exact'];
     } else {
-      coords = 'No coordinates';
-      stamp = ['stamp-none', p.geoFailed ? 'No match' : 'Unfiled'];
+      coords = 'Not on the map';
+      stamp = ['stamp-none', p.geoFailed ? 'Not found' : 'No location'];
     }
     const foot = el('div', { class: 'place-foot' },
       el('span', { class: 'list-name', text: p.list, title: p.list }),
@@ -284,20 +360,20 @@
         : el('span', { class: 'coords', text: coords }));
     foot.lastChild.__place = p;
     if (/^https?:\/\//i.test(p.url)) {
-      foot.append(el('a', { class: 'place-link', href: p.url, target: '_blank', rel: 'noopener', text: 'Open in Maps' }));
+      foot.append(el('a', { class: 'place-link', href: p.url, target: '_blank', rel: 'noopener', text: 'Open in Google Maps' }));
     }
     const guess = p.kindSource === 'guess';
     const tag = el('span', {
       class: 'kind' + (guess ? ' kind-guess' : '') + (p.kind ? '' : ' kind-none'),
-      text: !p.kind ? 'Type unknown' : guess ? `${p.kind} · guess` : p.kind,
-      title: !p.kind ? 'No type found yet'
-        : guess ? 'Guessed from the place name'
-        : `From OpenStreetMap${p.kindMatched ? ': ' + p.kindMatched : ''} (approximate)`,
+      text: !p.kind ? 'Type unknown' : guess ? `${p.kind} · guessed` : p.kind,
+      title: !p.kind ? 'We haven\'t found a type yet'
+        : guess ? 'Guessed from the place\'s name'
+        : `From OpenStreetMap${p.kindMatched ? ': ' + p.kindMatched : ''} (best guess)`,
     });
     const li = el('li', { class: 'card place' },
       el('div', { class: 'place-head' }, el('h2', { class: 'place-title', text: p.title }), tag),
       body);
-    if (p.matched) li.append(el('p', { class: 'matched', text: `Matched: ${p.matched}` }));
+    if (p.matched) li.append(el('p', { class: 'matched', text: `Found as: ${p.matched}` }));
     li.append(foot);
     return li;
   }
@@ -324,7 +400,7 @@
     const skipped = fmt === 'csv' ? 0 : rows.filter((p) => p.lat == null).length;
     $('workspace-error').hidden = !skipped;
     if (skipped) {
-      $('workspace-error').textContent = `${plural(skipped, 'place')} without coordinates ${skipped === 1 ? 'was' : 'were'} left out of the ${ext.toUpperCase()}. The CSV keeps every place.`;
+      $('workspace-error').textContent = `${plural(skipped, 'place')} ${skipped === 1 ? 'was' : 'were'} left out of the ${ext.toUpperCase()} file because ${skipped === 1 ? 'it has' : 'they have'} no spot on the map. The spreadsheet (CSV) includes every place.`;
     }
   }
 
@@ -338,17 +414,36 @@
   // Nominatim allows about one request a second, across every lookup we make.
   let lastRequest = 0;
   async function pace(signal) {
-    const wait = lastRequest + 1100 - Date.now();
+    const wait = lastRequest + 1300 - Date.now();
     lastRequest = Date.now() + Math.max(wait, 0);
     if (wait > 0) await sleep(wait, signal);
   }
 
+  const BACKOFF = [5000, 15000, 30000];
+  let notify = () => {};
+
   async function nominatimSearch(params, signal) {
-    await pace(signal);
-    const res = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&accept-language=en&' + params, { signal, headers: { Accept: 'application/json' } });
-    if (res.status === 429 || res.status === 403) throw new Error('rate');
-    if (!res.ok) throw new Error('http');
-    return res.json();
+    for (let attempt = 0; ; attempt++) {
+      await pace(signal);
+      let res = null;
+      try {
+        res = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&accept-language=en&' + params, { signal, headers: { Accept: 'application/json' } });
+      } catch (err) {
+        if (err.name === 'AbortError') throw err;
+        // Nominatim's 429 and 403 replies carry no CORS headers, so the browser reports them as a network error.
+      }
+      if (res && res.ok) return res.json();
+      if (res && res.status !== 429 && res.status !== 403) throw new Error('http');
+      if (attempt >= BACKOFF.length) throw new Error('refused');
+      notify(`OpenStreetMap is asking us to slow down. Waiting ${BACKOFF[attempt] / 1000} seconds, then trying again.`);
+      await sleep(BACKOFF[attempt], signal);
+    }
+  }
+
+  function failureNote(err, done, total, found, what) {
+    if (err.name === 'AbortError') return `Stopped after checking ${done} of ${total}. ${what} ${found}.`;
+    if (err.message === 'refused') return `OpenStreetMap stopped answering after ${done} of ${total}, probably because we asked too often. Your progress is saved. Wait a few minutes, then try again to carry on.`;
+    return `Something went wrong after ${done} of ${total}. Your progress is saved. Try again in a moment.`;
   }
 
   async function lookup(query, signal) {
@@ -371,6 +466,7 @@
     state.geo = { abort };
     const progress = $('geo-progress');
     const status = $('geo-status');
+    notify = (m) => { status.textContent = m; };
     progress.max = targets.length;
     progress.value = 0;
     progress.hidden = false;
@@ -395,17 +491,17 @@
         }
         done++;
         progress.value = done;
-        status.textContent = `Looked up ${done} of ${targets.length}. Found ${found}.`;
-        if (done % 5 === 0) { renderLedger(); renderCards(); renderMap(false); }
+        status.textContent = `Checked ${done} of ${targets.length}. Found ${found}.`;
+        if (done % 5 === 0) { renderLedger(); renderCards(); renderMap(false); save(); }
       }
-      note = `Done. Found ${found} of ${targets.length}. Matches are approximate: check the red "Matched" line on each card.`;
+      note = `Done. Found ${found} of ${targets.length}. These are best guesses, so check the "Found as" line on each place.`;
     } catch (err) {
-      if (err.name === 'AbortError') note = `Stopped after ${done} of ${targets.length}. Found ${found}.`;
-      else if (err.message === 'rate') note = `OpenStreetMap asked us to slow down after ${done} of ${targets.length}. Wait a minute and run it again to continue.`;
-      else note = `The lookup service could not be reached after ${done} of ${targets.length}. Check your connection and try again.`;
+      note = failureNote(err, done, targets.length, found, 'Found');
     }
+    notify = () => {};
     state.geo = null;
     progress.hidden = true;
+    save();
     render();
     $('geo-status').textContent = note;
   }
@@ -441,15 +537,13 @@
     return null;
   }
 
-  // With coordinates: search the title inside a ~500 m box, then ~5 km, then anywhere within 50 km. Without: search the title alone.
+  // With coordinates: the best-ranked match within 50 km, then a title search inside a ~2 km box. Without: search the title alone.
   async function findKind(p, near, signal) {
     const q = 'limit=5&namedetails=1&q=' + encodeURIComponent(p.title);
     if (p.lat == null) return firstKind(await nominatimSearch(near ? q + encodeURIComponent(', ' + near) : q, signal), p);
-    for (const d of [0.005, 0.05]) {
-      const hit = firstKind(await nominatimSearch(`${q}&bounded=1&viewbox=${box(p, d)}`, signal), p);
-      if (hit) return hit;
-    }
-    return firstKind(await nominatimSearch(q, signal), p, 50);
+    const ranked = firstKind(await nominatimSearch(q, signal), p, 50);
+    if (ranked) return ranked;
+    return firstKind(await nominatimSearch(`${q}&bounded=1&viewbox=${box(p, 0.02)}`, signal), p);
   }
 
   function abortTypes() {
@@ -457,13 +551,16 @@
   }
 
   async function runTypes() {
-    const targets = state.places.filter((p) => p.kindSource !== 'osm');
+    const pending = state.places.filter((p) => p.kindSource !== 'osm');
+    const untried = pending.filter((p) => !p.kindTried);
+    const targets = untried.length ? untried : pending;
     if (!targets.length) return;
     const near = $('near').value.trim();
     const abort = new AbortController();
     state.types = { abort };
     const progress = $('types-progress');
     const status = $('types-status');
+    notify = (m) => { status.textContent = m; };
     progress.max = targets.length;
     progress.value = 0;
     progress.hidden = false;
@@ -483,19 +580,19 @@
         if (hit) { p.kind = hit.kind; p.kindSource = 'osm'; p.kindMatched = hit.matched; found++; }
         done++;
         progress.value = done;
-        status.textContent = `Looked up ${done} of ${targets.length}. Confirmed ${found}.`;
-        if (done % 5 === 0) { renderKinds(); renderCards(); }
+        status.textContent = `Checked ${done} of ${targets.length}. Found ${found}.`;
+        if (done % 5 === 0) { renderKinds(); renderCards(); renderMap(false); save(); }
       }
       const left = done - found;
-      note = `Done. Confirmed ${found} of ${targets.length}.` + (left ? ` ${plural(left, 'place')} could not be matched and keep ${left === 1 ? 'its' : 'their'} name-based guess.` : '');
+      note = `Done. Found the type for ${found} of ${targets.length}.` + (left ? ` ${plural(left, 'place')} couldn\'t be matched, so ${left === 1 ? 'it keeps its' : 'they keep their'} guessed type.` : '');
     } catch (err) {
-      if (err.name === 'AbortError') note = `Stopped after ${done} of ${targets.length}. Confirmed ${found}.`;
-      else if (err.message === 'rate') note = `OpenStreetMap asked us to slow down after ${done} of ${targets.length}. Wait a minute and run it again to continue.`;
-      else note = `The lookup service could not be reached after ${done} of ${targets.length}. Check your connection and try again.`;
+      note = failureNote(err, done, targets.length, found, 'Found');
     }
+    notify = () => {};
     state.types = null;
     state.typeNote = note;
     progress.hidden = true;
+    save();
     render();
   }
 
@@ -507,11 +604,11 @@
     panel.hidden = !running && !fresh && !state.typeNote;
     if (panel.hidden) return;
     $('types-copy').textContent = fresh
-      ? `${plural(fresh, 'place has', 'places have')} no confirmed type. Look each one up on OpenStreetMap, near its coordinates when it has them. Titles are sent to nominatim.openstreetmap.org, about one a second, and matches are approximate.`
-      : 'Types come from OpenStreetMap matches and are approximate.';
+      ? `${plural(fresh, 'place has', 'places have')} no confirmed type (like café or museum). Placefile can search for each one on OpenStreetMap, a free map service. The names (nothing else) are sent to it, about one per second. Results are best guesses.`
+      : 'Types come from OpenStreetMap and are best guesses.';
     if (!running) $('types-status').textContent = state.typeNote;
     $('types-run').hidden = running || !pending.length;
-    $('types-run').textContent = fresh ? 'Look up types' : 'Try again';
+    $('types-run').textContent = fresh ? 'Find types' : 'Try again';
     $('types-cancel').hidden = !running;
   }
 
@@ -559,7 +656,6 @@
     const b = e.target.closest('.coords-btn');
     if (b) showOnMap(b.__place);
   });
-  $('kind').addEventListener('change', (e) => { state.kind = e.target.value === '*' ? null : e.target.value; state.shown = PAGE; renderCards(); });
   $('more').addEventListener('click', () => { state.shown += PAGE; renderCards(); });
   $('geo-run').addEventListener('click', runGeocode);
   $('geo-cancel').addEventListener('click', abortGeocode);
@@ -592,4 +688,10 @@
     drop.classList.remove('is-over');
     handleFiles(e.dataTransfer.files, { fresh: !$('intake').hidden });
   });
+
+  const saved = loadSaved();
+  if (saved.length) {
+    state.places = saved;
+    enterWorkspace();
+  }
 })();
